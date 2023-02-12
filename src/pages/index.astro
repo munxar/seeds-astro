@@ -1,0 +1,34 @@
+---
+import { CollectionEntry, getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+// alle seeds aber die tags hier sind nur strings z.B. ['dogs']
+const seeds = await getCollection("seeds");
+// jetzt lade ich hier alle tags
+const tags = await getCollection("tags");
+
+// hilfsfunktion, macht aus einen tag name ein CollectionEntry
+// könnte man auch allgemein machen, oder für jede relation schnell definieren
+function getTag(tag: string): CollectionEntry<"tags"> | undefined {
+  return tags.find((t) => t.slug === tag);
+}
+---
+
+<Layout title="Welcome to Astro.">
+  <h1>Hello</h1>
+  {
+    seeds.map((seed) => (
+      <div>
+        <h2>{seed.data.title}</h2>
+        {/* hier gehe ich durch alle tags, und hole mir das collection object */}
+        <div>
+          {seed.data.tags
+            .map((t) => getTag(t))
+            .map((tag) => (
+              // achtug, tag kann hier null sein, darum das tag?
+              <span>{tag?.data.title}</span>
+            ))}
+        </div>
+      </div>
+    ))
+  }
+</Layout>
